@@ -4,6 +4,10 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 
 //Cria a instância de um objeto que terá os métodos chamados remotamente
+/**
+ *
+ * @author Allan.Amaral
+ */
 public class Connect4Server {
 
     public static void main(String[] args) {
@@ -28,7 +32,5 @@ public class Connect4Server {
         //aceita invocações remotas de métodos para, por exemplo: registrar jogador, verificar se o segundo
         //    jogador já se registrou, receber jogadas, informar nome do oponente, mostrar tabuleiro, informar
         //    estado dos jogadores, etc.
-
     }
-
 }

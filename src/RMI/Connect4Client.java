@@ -5,7 +5,11 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
-//Eesponsável pela interação entre usuário e processo­servidor
+//Responsável pela interação entre usuário e processo­servidor
+/**
+ *
+ * @author Allan.Amaral
+ */
 public class Connect4Client {
 
     public static void main(String[] args) {
