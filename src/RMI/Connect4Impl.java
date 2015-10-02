@@ -93,8 +93,14 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
     }
 
     @Override
-    public String obtemGrade(Integer idJogador) throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Integer[][] obtemGrade(Integer idJogador) throws RemoteException {
+        List<Partida> partidasAux = this.partidas.stream().filter(p -> p.getJogadores().contains(idJogador))
+                .collect(Collectors.toList());
+        
+        if (partidasAux.isEmpty()) return null;
+            
+        Partida partida = partidasAux.get(0);
+        return partida.getTabuleiro().getGrade();
     }
 
     @Override
