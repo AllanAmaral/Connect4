@@ -8,6 +8,11 @@ public class Jogador {
     
     private Integer idJogador;
     private String nomeJogador;
+
+    public Jogador(Integer idJogador, String nomeJogador) {
+        this.idJogador = idJogador;
+        this.nomeJogador = nomeJogador;
+    }
     
     public Integer getIdJogador() {
         return idJogador;

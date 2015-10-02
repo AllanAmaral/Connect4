@@ -17,13 +17,12 @@ public interface Connect4Interface extends Remote {
 
     //­1 -> erro
     // 0 -> ainda não há partida
-    // 1 -> há partida e o jogador inicia jogando
-    // 2 -> há partida e o jogador é o segundo a jogar
+    // ordem de jogada do jogador
     public int temPartida(Integer idJogador) throws RemoteException;
     
     //-1 -> erro
     // 1 -> tudo certo
-    public int criaPartida(Integer idJogador, Integer tamanhoTabuleiro) throws RemoteException;
+    public int criaPartida(Integer idJogador, Integer tamanhoTabuleiro, Integer numJogadores) throws RemoteException;
     
     //­1 -> erro
     // 0 -> não

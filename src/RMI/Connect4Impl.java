@@ -6,6 +6,7 @@ import Objetos.Tabuleiro;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,33 +36,31 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
     }
 
     @Override
-    public int registraJogador(String nomeJogador) throws RemoteException {
-        Jogador j = new Jogador();
-        j.setNomeJogador(nomeJogador);
-        j.setIdJogador(getPID());
+    public synchronized int registraJogador(String nomeJogador) throws RemoteException {
+        Collection<Jogador> jogadoresAux = this.jogadores.values();
         
+        if (jogadoresAux.stream().filter(j -> (nomeJogador.equals(j.getNomeJogador()))).count() > 0) 
+            return -1;
+        
+        Jogador j = new Jogador(getPID(), nomeJogador);        
         this.jogadores.put(j.getIdJogador(), j);
         
         return j.getIdJogador();
     }
 
     @Override
-    //­1 -> erro
-    // 0 -> ainda não há partida
-    // 1 -> há partida e o jogador inicia jogando
-    // 2 -> há partida e o jogador é o segundo a jogar
-    public int temPartida(Integer idJogador) throws RemoteException {
+    public synchronized int temPartida(Integer idJogador) throws RemoteException {
         if (partidas.isEmpty()) return 0;
         
         List<Partida> partidasAux = partidas.stream().filter(p -> 
-                (p.getJogadores() != null && p.getJogadores().size() < 2))
+                (p.getJogadores() != null && p.getJogadores().size() < p.getNumJogadores()))
                 .collect(Collectors.toList());
         
         if (partidasAux.isEmpty()) return 0;
             
         Partida partida = partidasAux.get(0);
-        if (partida.getJogadores().isEmpty())
-            partida.setJogadores(new ArrayList<>());
+        if (partida == null || partida.getJogadores().isEmpty())
+            return 0;
                     
         partida.getJogadores().add(idJogador);
         
@@ -71,16 +70,13 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
     }
     
     @Override
-    public int criaPartida(Integer idJogador, Integer tamanhoTabuleiro) throws RemoteException{
-        try {
-            Partida partida = new Partida();
-            Tabuleiro tabuleiro = new Tabuleiro();
+    public synchronized int criaPartida(Integer idJogador, Integer tamanhoTabuleiro, Integer numJogadores) throws RemoteException{
+        try {           
             List<Integer> listaJogador = new ArrayList<>();
-
             listaJogador.add(idJogador);
-            tabuleiro.setNumColuna(tamanhoTabuleiro);
-            partida.setTabuleiro(tabuleiro);
-            partida.setJogadores(listaJogador);
+            
+            Tabuleiro tabuleiro = new Tabuleiro(tamanhoTabuleiro);
+            Partida partida = new Partida(listaJogador, tabuleiro, numJogadores);
 
             this.partidas.add(partida);
 
@@ -122,7 +118,7 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
     }
 
     @Override
-    public int encerraPartida(Integer idJogador) throws RemoteException {
+    public synchronized int encerraPartida(Integer idJogador) throws RemoteException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
