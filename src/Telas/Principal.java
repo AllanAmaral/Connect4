@@ -3,13 +3,7 @@ package Telas;
 import Objetos.MatrizTableModel;
 import RMI.Connect4Interface;
 import java.rmi.RemoteException;
-import javax.swing.GroupLayout;
-import javax.swing.JButton;
-import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 
 /**
  *
@@ -109,7 +103,18 @@ public class Principal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
+        try {
+            Integer coluna = (Integer) this.jFormattedTextField1.getValue();
+            
+            this.connect4.ehMinhaVez(this.jogador);
+            
+            this.connect4.enviaJogada(this.jogador, coluna);
+            
+            this.model = new MatrizTableModel(this.connect4.obtemGrade(this.jogador));
+            
+        } catch(RemoteException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao obter grade: " + e.getMessage(), "ERRO", JOptionPane.ERROR);
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
