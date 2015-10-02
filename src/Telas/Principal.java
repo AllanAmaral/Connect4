@@ -22,6 +22,66 @@ public class Principal extends javax.swing.JFrame {
             this.model = new MatrizTableModel(this.connect4.obtemGrade(this.jogador));
 
             initComponents();
+            
+            esperaVez();
+        
+        } catch(RemoteException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao obter grade: " + e.getMessage(), "ERRO", JOptionPane.ERROR);
+        }
+    }
+    
+    private void esperaVez() {
+        try {
+            Integer vez = 0;
+        
+            while (vez < 1) {
+                String msg = "";
+
+                switch(vez) {
+                    case 0:
+                        jButton1.setEnabled(false);
+                        jLabel2.setText("Aguardando oponente...");
+                    break;
+
+                    case 1:
+                        jButton1.setEnabled(true);
+                        msg = "Minha vez!";
+                    break;
+
+                    case 2:
+                        jButton1.setEnabled(false);
+                        jLabel2.setText("Vencedor :D");
+                        msg = "Parabéns, você é o vencedor!!!";
+                    break;
+
+                    case 3:
+                        jButton1.setEnabled(false);
+                        jLabel2.setText("Perdeu :(");
+                        msg = "Que pena, você perdeu.";
+                    break;
+
+                    case 4:
+                        jButton1.setEnabled(false);
+                        jLabel2.setText("Empate");
+                        msg = "Bom jogo, acabou empatado.";
+                    break;
+
+                    case 5:
+                        jButton1.setEnabled(false);
+                        jLabel2.setText("Vencedor por WO :D");
+                        msg = "Parabéns, você venceu por WO!!!";
+                    break;
+
+                    case 6:
+                        jButton1.setEnabled(false);
+                        jLabel2.setText("Perdeu :(");
+                        msg = "Que pena, você perdeu por WO.";
+                    break;
+                }
+                JOptionPane.showMessageDialog(null, msg, "Mensagem", JOptionPane.INFORMATION_MESSAGE);
+             
+                vez = this.connect4.ehMinhaVez(this.jogador);
+            }
         
         } catch(RemoteException e) {
             JOptionPane.showMessageDialog(null, "Erro ao obter grade: " + e.getMessage(), "ERRO", JOptionPane.ERROR);
@@ -36,6 +96,7 @@ public class Principal extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
+        jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -47,6 +108,7 @@ public class Principal extends javax.swing.JFrame {
 
         jButton1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jButton1.setText("JOGAR");
+        jButton1.setEnabled(false);
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -68,6 +130,8 @@ public class Principal extends javax.swing.JFrame {
         jTable1.setModel(this.model);
         jScrollPane1.setViewportView(jTable1);
 
+        jLabel2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -82,16 +146,20 @@ public class Principal extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addComponent(jButton1))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(24, 24, 24)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(26, Short.MAX_VALUE))
+                        .addGap(27, 27, 27)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addContainerGap(29, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(jFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -105,12 +173,12 @@ public class Principal extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         try {
             Integer coluna = (Integer) this.jFormattedTextField1.getValue();
-            
-            this.connect4.ehMinhaVez(this.jogador);
-            
+
             this.connect4.enviaJogada(this.jogador, coluna);
             
             this.model = new MatrizTableModel(this.connect4.obtemGrade(this.jogador));
+            
+            esperaVez();
             
         } catch(RemoteException e) {
             JOptionPane.showMessageDialog(null, "Erro ao obter grade: " + e.getMessage(), "ERRO", JOptionPane.ERROR);
@@ -121,6 +189,7 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JButton jButton1;
     private javax.swing.JFormattedTextField jFormattedTextField1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
