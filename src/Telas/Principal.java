@@ -36,7 +36,8 @@ public class Principal extends javax.swing.JFrame {
         
             while (vez < 1) {
                 String msg = "";
-
+                vez = this.connect4.ehMinhaVez(this.jogador);
+                
                 switch(vez) {
                     case 0:
                         jButton1.setEnabled(false);
@@ -79,8 +80,6 @@ public class Principal extends javax.swing.JFrame {
                     break;
                 }
                 JOptionPane.showMessageDialog(null, msg, "Mensagem", JOptionPane.INFORMATION_MESSAGE);
-             
-                vez = this.connect4.ehMinhaVez(this.jogador);
             }
         
         } catch(RemoteException e) {
