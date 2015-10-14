@@ -53,7 +53,7 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
         if (partidas.isEmpty()) return 0;
         
         List<Partida> partidasAux = partidas.stream().filter(p -> 
-                (p.getJogadores() != null && p.getJogadores().size() < p.getNumJogadores()))
+                (p.getJogadores() != null && p.getJogadores().size() < 2))
                 .collect(Collectors.toList());
         
         if (partidasAux.isEmpty()) return 0;
@@ -70,13 +70,13 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
     }
     
     @Override
-    public synchronized int criaPartida(Integer idJogador, Integer tamanhoTabuleiro, Integer numJogadores) throws RemoteException{
+    public synchronized int criaPartida(Integer idJogador, Integer tamanhoTabuleiro) throws RemoteException{
         try {           
             List<Integer> listaJogador = new ArrayList<>();
             listaJogador.add(idJogador);
             
             Tabuleiro tabuleiro = new Tabuleiro(tamanhoTabuleiro);
-            Partida partida = new Partida(listaJogador, tabuleiro, numJogadores);
+            Partida partida = new Partida(listaJogador, tabuleiro);
 
             this.partidas.add(partida);
 

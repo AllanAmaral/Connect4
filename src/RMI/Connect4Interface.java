@@ -22,7 +22,7 @@ public interface Connect4Interface extends Remote {
     
     //-1 -> erro
     // 1 -> tudo certo
-    public int criaPartida(Integer idJogador, Integer tamanhoTabuleiro, Integer numJogadores) throws RemoteException;
+    public int criaPartida(Integer idJogador, Integer tamanhoTabuleiro) throws RemoteException;
     
     //­1 -> erro
     // 0 -> não

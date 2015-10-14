@@ -10,12 +10,10 @@ public class Partida {
     
     private List<Integer> jogadores;
     private Tabuleiro tabuleiro;
-    private Integer numJogadores;
 
-    public Partida(List<Integer> jogadores, Tabuleiro tabuleiro, Integer numJogadores) {
+    public Partida(List<Integer> jogadores, Tabuleiro tabuleiro) {
         this.jogadores = jogadores;
         this.tabuleiro = tabuleiro;
-        this.numJogadores = numJogadores;
     }
     
     public List<Integer> getJogadores() {
@@ -34,12 +32,4 @@ public class Partida {
         this.tabuleiro = tabuleiro;
     }
 
-    public Integer getNumJogadores() {
-        return numJogadores;
-    }
-
-    public void setNumJogadores(Integer numJogadores) {
-        this.numJogadores = numJogadores;
-    }
-    
 }
