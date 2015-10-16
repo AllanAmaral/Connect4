@@ -52,14 +52,17 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
     public synchronized int temPartida(Integer idJogador) throws RemoteException {
         if (partidas.isEmpty()) return 0;
   
-        Partida partida = getMinhaPartida(idJogador);
-
+       List<Partida> partidasAux = partidas.stream().filter(p -> 
+                (p.getJogadores() != null && p.getJogadores().size() < 2))
+                .collect(Collectors.toList());
+        
+        if (partidasAux.isEmpty()) return 0;
+            
+        Partida partida = partidasAux.get(0);
         if (partida == null || partida.getJogadores().isEmpty())
             return 0;
                     
         partida.getJogadores().add(idJogador);
-        
-        //this.partidas.replace(partida.getIdPartida(), this.partidas.get(partida.getIdPartida()), partida);
         
         return partida.getJogadores().size();
     }
