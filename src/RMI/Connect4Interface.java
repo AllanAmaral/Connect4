@@ -56,4 +56,5 @@ public interface Connect4Interface extends Remote {
     //  ou seja, receberá o código 5 quando chamar ehMinhaVez)
     public int encerraPartida(Integer idJogador) throws RemoteException;
 
+    public String getNomeJogador(Integer idJogador) throws RemoteException;
 }

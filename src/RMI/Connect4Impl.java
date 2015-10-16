@@ -63,6 +63,10 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
             return 0;
                     
         partida.getJogadores().add(idJogador);
+        partida.setJogadorDaVez(1);
+        
+        Jogador jogador = jogadores.get(idJogador);
+        jogador.setOrdemJogada(partida.getJogadores().size());
         
         return partida.getJogadores().size();
     }
@@ -75,7 +79,9 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
             
             Tabuleiro tabuleiro = new Tabuleiro(tamanhoTabuleiro);
             Partida partida = new Partida(listaJogador, tabuleiro);
-
+            Jogador jogador = jogadores.get(idJogador);
+            jogador.setOrdemJogada(partida.getJogadores().size());
+        
             this.partidas.add(partida);
 
             return 1;
@@ -89,18 +95,18 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
     public int ehMinhaVez(Integer idJogador) throws RemoteException {
         Partida partida = getMinhaPartida(idJogador);
         Jogador jogador = jogadores.get(idJogador);
+        Integer vencedor = 0;
         
         if (partida == null || jogador == null) return -1;
-
-        Integer vencedor = verificarVencedor(partida, jogador);
         
-        if (vencedor < 0) {
-            if (partida.getJogadorDaVez().equals(jogador.getOrdemJogada())) return 1;
-            else return 0;
-            
-        } else {
+        if (partida.getJogadores().size() > 1)
+            vencedor = verificarVencedor(partida, jogador);
+        
+        if (vencedor > 0)
             return vencedor;
-        }
+            
+        if (partida.getJogadorDaVez().equals(jogador.getOrdemJogada())) return 1;
+        else return 0;
     }
 
     @Override
@@ -292,4 +298,8 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
         return false;
     }
     
+    @Override
+    public String getNomeJogador(Integer idJogador) {
+        return jogadores.get(idJogador).getNomeJogador();
+    }
 }
