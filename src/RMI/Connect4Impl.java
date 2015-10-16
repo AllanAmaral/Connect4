@@ -51,14 +51,9 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
     @Override
     public synchronized int temPartida(Integer idJogador) throws RemoteException {
         if (partidas.isEmpty()) return 0;
-        
-        List<Partida> partidasAux = partidas.stream().filter(p -> 
-                (p.getJogadores() != null && p.getJogadores().size() < 2))
-                .collect(Collectors.toList());
-        
-        if (partidasAux.isEmpty()) return 0;
-            
-        Partida partida = partidasAux.get(0);
+  
+        Partida partida = getMinhaPartida(idJogador);
+
         if (partida == null || partida.getJogadores().isEmpty())
             return 0;
                     
@@ -89,30 +84,36 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
 
     @Override
     public int ehMinhaVez(Integer idJogador) throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Partida partida = getMinhaPartida(idJogador);
+        Jogador jogador = jogadores.get(idJogador);
+        
+        if (partida == null || jogador == null) return -1;
+
+        Integer vencedor = verificarVencedor(partida, jogador);
+        
+        if (vencedor < 0) {
+            if (partida.getJogadorDaVez().equals(jogador.getOrdemJogada())) return 1;
+            else return 0;
+            
+        } else {
+            return vencedor;
+        }
     }
 
     @Override
     public Integer[][] obtemGrade(Integer idJogador) throws RemoteException {
-        List<Partida> partidasAux = this.partidas.stream().filter(p -> p.getJogadores().contains(idJogador))
-                .collect(Collectors.toList());
+        Partida partida = getMinhaPartida(idJogador);
         
-        if (partidasAux.isEmpty()) return null;
-            
-        Partida partida = partidasAux.get(0);
+        if (partida == null) return new Integer[0][0];
+        
         return partida.getTabuleiro().getGrade();
     }
 
     @Override
     public String obtemOponente(Integer idJogador) throws RemoteException {
-        List<Partida> partidasAux = this.partidas.stream().filter(p -> 
-                (p.getJogadores() != null && p.getJogadores().contains(idJogador)))
-                .collect(Collectors.toList());
+        Partida partida = getMinhaPartida(idJogador);
         
-        if (partidasAux.isEmpty()) return "";
-            
-        Partida partida = partidasAux.get(0);
-        if (partida.getJogadores().isEmpty()) return "";
+        if (partida == null || partida.getJogadores().size() < 2) return "";
         
         return this.jogadores.get(partida.getJogadores().stream().filter(j -> !j.equals(idJogador))
                 .collect(Collectors.toList()).get(0)).getNomeJogador();
@@ -120,12 +121,172 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
 
     @Override
     public int enviaJogada(Integer idJogador, Integer numColuna) throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Partida partida = getMinhaPartida(idJogador);
+        Jogador jogador = jogadores.get(idJogador);
+        
+        if (partida == null) return -1;
+        
+        Tabuleiro tabuleiro = partida.getTabuleiro();
+        Integer[][] grade = tabuleiro.getGrade();
+        
+        if (colunaCheia(tabuleiro, numColuna)) return 0;
+        
+        for (int i=tabuleiro.getNumColuna(); i>0; i--) {
+            if (null == grade[numColuna][i]) {
+                grade[numColuna][i] = jogador.getOrdemJogada();
+                return 1;
+            }
+        }
+        return -1;        
     }
 
     @Override
     public synchronized int encerraPartida(Integer idJogador) throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Partida partida = getMinhaPartida(idJogador);
+        
+        if (partida == null) return -1;
+        
+        Jogador jogador = jogadores.get(idJogador);
+        Jogador oponente = this.jogadores.get(partida.getJogadores().stream().filter(j -> !j.equals(idJogador))
+                .collect(Collectors.toList()).get(0));
+
+        jogador.setStatus(6);   // 6 -> perdedor por WO
+        oponente.setStatus(5);  // 5 -> vencedor por WO
+        
+        return 0;
+    }
+    
+    private Partida getMinhaPartida(Integer idJogador){
+        List<Partida> partidasAux = this.partidas.stream().filter(p -> 
+                (p.getJogadores() != null && p.getJogadores().contains(idJogador)))
+                .collect(Collectors.toList());
+        
+        if (partidasAux.isEmpty()) return null;
+            
+        return partidasAux.get(0);
     }
 
+    private boolean colunaCheia(Tabuleiro tabuleiro, Integer numColuna) {
+        for (int i=0; i>tabuleiro.getNumColuna(); i++) {
+            if (null == tabuleiro.getGrade()[numColuna][i])
+                return false;
+        }
+        
+        return true;
+    }
+    
+    private int verificarVencedor(Partida partida, Jogador jogador) {
+        Jogador oponente = this.jogadores.get(partida.getJogadores().stream().filter(j -> !j.equals(jogador.getIdJogador()))
+                .collect(Collectors.toList()).get(0));
+        Tabuleiro tabuleiro = partida.getTabuleiro();
+        boolean vencedor;
+        
+        vencedor = verificarVertical(tabuleiro, jogador.getOrdemJogada());
+        if (!vencedor)
+            vencedor = verificarHorizontal(tabuleiro, jogador.getOrdemJogada());
+        if (!vencedor)
+            vencedor = verificarDiagonal(tabuleiro, jogador.getOrdemJogada());
+        
+        if (oponente.getStatus() == 2 && vencedor) {    // 4 -> houve empate
+            jogador.setStatus(4);
+            oponente.setStatus(4);
+            return 4;
+        }
+        if (vencedor) {                                 // 2 -> é o vencedor
+            jogador.setStatus(2);
+            oponente.setStatus(3);
+            return 2;
+        }
+        if (oponente.getStatus() == 2) {                // 3 -> é o perdedor
+            jogador.setStatus(3);
+            return 3;
+        }
+        if (oponente.getStatus() == 5) {                // 6 -> perdedor por WO
+            jogador.setStatus(6);
+            return 6;
+        }
+        
+        return -1;        
+    }
+
+    private boolean verificarVertical(Tabuleiro tabuleiro, Integer jogador) {
+        Integer[][] grade = tabuleiro.getGrade();
+        Integer size = tabuleiro.getNumColuna();
+        for (int i=0; i > size; i++) {
+            for (int j=0; j > size; j++) {
+                if (null != grade[i][j]) {
+                    if (grade[i][j].equals(jogador)) {
+                        if (i+1 <= size && grade[i+1][j].equals(jogador)) {
+                            if (i+2 <= size && grade[i+2][j].equals(jogador)) {
+                                if (i+3 <= size && grade[i+3][j].equals(jogador)) {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean verificarHorizontal(Tabuleiro tabuleiro, Integer jogador) {
+        Integer[][] grade = tabuleiro.getGrade();
+        Integer size = tabuleiro.getNumColuna();
+        for (int i=0; i > size; i++) {
+            for (int j=0; j > size; j++) {
+                if (null != grade[i][j]) {
+                    if (grade[i][j].equals(jogador)) {
+                        if (j+1 <= size && grade[i][j+1].equals(jogador)) {
+                            if (j+2 <= size && grade[i][j+2].equals(jogador)) {
+                                if (j+3 <= size && grade[i][j+3].equals(jogador)) {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean verificarDiagonal(Tabuleiro tabuleiro, Integer jogador) {
+        Integer[][] grade = tabuleiro.getGrade();
+        Integer size = tabuleiro.getNumColuna();
+        //Diagonal maior
+        for (int i=0; i > size; i++) {
+            for (int j=0; j > size; j++) {
+                if (null != grade[i][j]) {
+                    if (grade[i][j].equals(jogador)) {
+                        if (i+1 <= size && j+1 <= size && grade[i+1][j+1].equals(jogador)) {
+                            if (i+2 <= size && j+2 <= size && grade[i+2][j+2].equals(jogador)) {
+                                if (i+3 <= size && j+3 <= size && grade[i+3][j+3].equals(jogador)) {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        //Diagonal menor
+        for (int i=0; i > size; i++) {
+            for (int j=0; j > size; j++) {
+                if (null != grade[i][j]) {
+                    if (grade[i][j].equals(jogador)) {
+                        if (i-1 > -1 && j-1 > -1 && grade[i-1][j-1].equals(jogador)) {
+                            if (i-2 > -1 && j-2 > -1 && grade[i-2][j-2].equals(jogador)) {
+                                if (i-3 > -1 && j-3 > -1 && grade[i-2][j-3].equals(jogador)) {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
 }
