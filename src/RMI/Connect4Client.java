@@ -22,7 +22,7 @@ public class Connect4Client {
             String nomeJogador;
             Integer jogador = -1;
             Integer ordemJogada;
-            Integer tamanhoTabuleiro;
+            Integer tamanhoTabuleiro = 0;
             Connect4Interface connect4 = (Connect4Interface) Naming.lookup("//localhost/Connect4");
             
             //Obtém o nome do jogador e envia este nome para o servidor (isto corresponde ao registro do jogador);
@@ -80,13 +80,13 @@ public class Connect4Client {
                 
                 if (continuar.equalsIgnoreCase("N")) {
                     connect4.encerraPartida(jogador);
-                    JOptionPane.showMessageDialog(null, "Partida Encerrada", "Mensagem", JOptionPane.INFORMATION_MESSAGE);
+                    System.out.print("Partida Encerrada.");
                 }
             }
             //Fim
             
             //Após o registro do segundo jogador, passa­se para um ciclo de jogadas até o fim da partida.
-            jogadas(connect4, jogador);
+            jogadas(connect4, jogador, tamanhoTabuleiro);
             //Fim
 
         } catch (NotBoundException | MalformedURLException | RemoteException | HeadlessException e) {
@@ -94,7 +94,73 @@ public class Connect4Client {
         }
     }
 
-    private static void jogadas(Connect4Interface connect4, Integer jogador) throws RemoteException {
+    private static void jogadas(Connect4Interface connect4, Integer jogador, Integer tamanhoTabuleiro) throws RemoteException, InterruptedException {
+        Scanner entrada = new Scanner(System.in);
         System.out.println(connect4.obtemGrade(jogador));
+        Integer coluna = 0;
+        String cc = "";
+        
+        Integer vez = 0;
+        while (vez < 2) {
+            vez = connect4.ehMinhaVez(jogador);
+
+            switch(vez) {
+                case 0:
+                    System.out.println("Aguardando oponente...");
+                break;
+
+                case 1:
+                    System.out.println("Sua vez!");
+                    
+                    while(!cc.equalsIgnoreCase("S") && !cc.equalsIgnoreCase("N")) {
+                        System.out.print("Quer sair do jogo (S/N)? ");
+                        cc = entrada.next();
+
+                        if (cc.equalsIgnoreCase("S")) {
+                            connect4.encerraPartida(jogador);
+                            break;
+                        }
+                    }
+                    
+                    while (coluna < 0 || coluna > tamanhoTabuleiro) {
+                        try {
+                            coluna = Integer.valueOf(cc);
+                            
+                            if (coluna < 7) {
+                                System.out.print("Qual coluna você jogará (Iniciando em '0')? ");
+                                cc = entrada.next();
+                            }
+                            
+                        } catch(Exception e) {
+                            coluna = -1;
+                        }
+                    }
+                    
+                    connect4.enviaJogada(jogador, coluna);
+                break;
+
+                case 2:
+                    System.out.println("Parabéns, você é o vencedor!!!");
+                break;
+
+                case 3:
+                    System.out.println("Que pena, você perdeu.");
+                break;
+
+                case 4:
+                    System.out.println("Bom jogo, acabou empatado.");
+                break;
+
+                case 5:
+                    System.out.println("Parabéns, você venceu por WO!!!");
+                break;
+
+                case 6:
+                    System.out.println("Que pena, você perdeu por WO.");
+                break;
+            }
+            Thread.sleep(1000);
+        }
     }
+
 }
