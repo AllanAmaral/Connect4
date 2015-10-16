@@ -38,7 +38,7 @@ public interface Connect4Interface extends Remote {
 
     //String vazia -> erro
     //Sring com a grade
-    public Integer[][] obtemGrade(Integer idJogador) throws RemoteException;
+    public String obtemGrade(Integer idJogador) throws RemoteException;
 
     //String vazia -> erro
     //String com o nome do oponente
