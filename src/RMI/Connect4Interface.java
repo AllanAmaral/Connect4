@@ -57,4 +57,6 @@ public interface Connect4Interface extends Remote {
     public int encerraPartida(Integer idJogador) throws RemoteException;
 
     public String getNomeJogador(Integer idJogador) throws RemoteException;
+    
+    public Integer getTamanhoTabuleiro(Integer idJogador) throws RemoteException;
 }

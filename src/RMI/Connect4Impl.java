@@ -92,7 +92,7 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
     }
 
     @Override
-    public int ehMinhaVez(Integer idJogador) throws RemoteException {
+    public synchronized int ehMinhaVez(Integer idJogador) throws RemoteException {
         Partida partida = getMinhaPartida(idJogador);
         Jogador jogador = jogadores.get(idJogador);
         Integer vencedor = 0;
@@ -112,12 +112,16 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
     @Override
     public String obtemGrade(Integer idJogador) throws RemoteException {
         Partida partida = getMinhaPartida(idJogador);
-        String grade = "";
+        String grade = " ";
         
         if (partida == null) return "";
         
         Tabuleiro tabuleiro = partida.getTabuleiro();
         
+        for (int i=0; i < tabuleiro.getNumColuna(); i++) {
+                grade += "c" + i + " ";
+        }
+        grade += "\n";
         for (int i=0; i < tabuleiro.getNumColuna(); i++) {
             for (int j=0; j < tabuleiro.getNumColuna(); j++) {
                 grade += "[" + tabuleiro.getGrade()[i][j] + "]";
@@ -138,7 +142,7 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
     }
 
     @Override
-    public int enviaJogada(Integer idJogador, Integer numColuna) throws RemoteException {
+    public synchronized int enviaJogada(Integer idJogador, Integer numColuna) throws RemoteException {
         Partida partida = getMinhaPartida(idJogador);
         Jogador jogador = jogadores.get(idJogador);
         
@@ -149,9 +153,13 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
         
         if (colunaCheia(tabuleiro, numColuna)) return 0;
         
-        for (int i=tabuleiro.getNumColuna(); i > 0; i--) {
-            if (null == grade[numColuna][i]) {
-                grade[numColuna][i] = jogador.getOrdemJogada();
+        for (int i=(tabuleiro.getNumColuna()-1); i >= 0; i--) {
+            if (0 == grade[i][numColuna]) {
+                grade[i][numColuna] = jogador.getOrdemJogada();
+                if (jogador.getOrdemJogada().equals(1))
+                    partida.setJogadorDaVez(2);
+                else
+                    partida.setJogadorDaVez(1);
                 return 1;
             }
         }
@@ -186,7 +194,7 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
 
     private boolean colunaCheia(Tabuleiro tabuleiro, Integer numColuna) {
         for (int i=0; i < tabuleiro.getNumColuna(); i++) {
-            if (null == tabuleiro.getGrade()[numColuna][i])
+            if (0 == tabuleiro.getGrade()[numColuna][i])
                 return false;
         }
         
@@ -229,7 +237,7 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
 
     private boolean verificarVertical(Tabuleiro tabuleiro, Integer jogador) {
         Integer[][] grade = tabuleiro.getGrade();
-        Integer size = tabuleiro.getNumColuna();
+        Integer size = tabuleiro.getNumColuna() - 1;
         for (int i=0; i < size; i++) {
             for (int j=0; j < size; j++) {
                 if (null != grade[i][j]) {
@@ -250,7 +258,7 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
 
     private boolean verificarHorizontal(Tabuleiro tabuleiro, Integer jogador) {
         Integer[][] grade = tabuleiro.getGrade();
-        Integer size = tabuleiro.getNumColuna();
+        Integer size = tabuleiro.getNumColuna() - 1;
         for (int i=0; i < size; i++) {
             for (int j=0; j < size; j++) {
                 if (null != grade[i][j]) {
@@ -271,7 +279,7 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
 
     private boolean verificarDiagonal(Tabuleiro tabuleiro, Integer jogador) {
         Integer[][] grade = tabuleiro.getGrade();
-        Integer size = tabuleiro.getNumColuna();
+        Integer size = tabuleiro.getNumColuna() - 1;
         //Diagonal maior
         for (int i=0; i < size; i++) {
             for (int j=0; j < size; j++) {
@@ -310,5 +318,10 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
     @Override
     public String getNomeJogador(Integer idJogador) {
         return jogadores.get(idJogador).getNomeJogador();
+    }
+    
+    @Override
+    public Integer getTamanhoTabuleiro(Integer idJogador) {
+        return getMinhaPartida(idJogador).getTabuleiro().getNumColuna();
     }
 }
