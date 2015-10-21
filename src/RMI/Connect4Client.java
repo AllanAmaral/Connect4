@@ -5,7 +5,6 @@ import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.util.Arrays;
 import java.util.Scanner;
 import javax.swing.JOptionPane;
 
@@ -22,7 +21,7 @@ public class Connect4Client {
             String nomeJogador;
             Integer jogador = -1;
             Integer ordemJogada;
-            Integer tamanhoTabuleiro = 0;
+            Integer tamanhoTabuleiro;
             Connect4Interface connect4 = (Connect4Interface) Naming.lookup("//localhost/Connect4");
             
             //Obtém o nome do jogador e envia este nome para o servidor (isto corresponde ao registro do jogador);
