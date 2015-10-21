@@ -115,16 +115,6 @@ public class Connect4Client {
                 case 1:
                     System.out.println("Sua vez " + nomeJogador + "!");
                     System.out.println(connect4.obtemGrade(jogador));
-                     
-                    /*while(!cc.equalsIgnoreCase("S") && !cc.equalsIgnoreCase("N")) {
-                        System.out.print("Se quiser sair do jogo digite 'S'? ");
-                        cc = entrada.next();
-
-                        if (cc.equalsIgnoreCase("S")) {
-                            connect4.encerraPartida(jogador);
-                            break;
-                        }
-                    }*/
                     
                     while (coluna < 0 || coluna > tamanhoTabuleiro) {
                         try {
@@ -152,23 +142,23 @@ public class Connect4Client {
 
                 case 2:
                     System.out.println("Parabéns " + nomeJogador + ", você é o vencedor!!!");
-                break;
+                    return;
 
                 case 3:
                     System.out.println("Que pena " + nomeJogador + ", você perdeu.");
-                break;
+                    return; 
 
                 case 4:
                     System.out.println("Bom jogo " + nomeJogador + ", acabou empatado.");
-                break;
+                    return;
 
                 case 5:
                     System.out.println("Parabéns " + nomeJogador + ", você venceu por WO!!!");
-                break;
+                    return;
 
                 case 6:
                     System.out.println("Que pena " + nomeJogador + ", você perdeu por WO.");
-                break;
+                    return;
             }
             Thread.sleep(5000);
         }

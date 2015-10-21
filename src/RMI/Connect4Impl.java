@@ -281,6 +281,7 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
         Integer[][] grade = tabuleiro.getGrade();
         Integer size = tabuleiro.getNumColuna() - 1;
         //Diagonal maior
+
         for (int i=0; i < size; i++) {
             for (int j=0; j < size; j++) {
                 if (null != grade[i][j]) {
@@ -301,9 +302,9 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
             for (int j=0; j < size; j++) {
                 if (null != grade[i][j]) {
                     if (grade[i][j].equals(jogador)) {
-                        if (i-1 > -1 && j-1 > -1 && grade[i-1][j-1].equals(jogador)) {
-                            if (i-2 > -1 && j-2 > -1 && grade[i-2][j-2].equals(jogador)) {
-                                if (i-3 > -1 && j-3 > -1 && grade[i-2][j-3].equals(jogador)) {
+                        if (i+1 <= size && j-1 > -1 && grade[i+1][j-1].equals(jogador)) {
+                            if (i+2 <= size && j-2 > -1 && grade[i+2][j-2].equals(jogador)) {
+                                if (i+3 <= size && j-3 > -1 && grade[i+3][j-3].equals(jogador)) {
                                     return true;
                                 }
                             }
