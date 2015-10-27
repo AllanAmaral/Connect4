@@ -55,8 +55,16 @@ public interface Connect4Interface extends Remote {
     //  a partida ou de se determinar que houve empate, o outro jogador será vencedor por WO
     //  ou seja, receberá o código 5 quando chamar ehMinhaVez)
     public int encerraPartida(Integer idJogador) throws RemoteException;
-
+    
+    //-1 -> erro
+    // 0 -> sucesso
+    public int encerraJogador(Integer idJogador) throws RemoteException;
+    
+    //String vazia -> erro
+    //String com o nome do jogador
     public String getNomeJogador(Integer idJogador) throws RemoteException;
     
+    //0 -> erro
+    //Tamanho do tabuleiro
     public Integer getTamanhoTabuleiro(Integer idJogador) throws RemoteException;
 }

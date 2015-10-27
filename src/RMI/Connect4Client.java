@@ -16,14 +16,18 @@ import javax.swing.JOptionPane;
 public class Connect4Client {
 
     public static void main(String[] args) throws Exception {
+        
         try {
             Scanner entrada = new Scanner(System.in);
             String nomeJogador;
             Integer jogador = -1;
             Integer ordemJogada;
             Integer tamanhoTabuleiro;
-            Connect4Interface connect4 = (Connect4Interface) Naming.lookup("//localhost/Connect4");
+            Connect4Interface connect4;
+            String novaPartida = "S";
             
+            connect4 = (Connect4Interface) Naming.lookup("//localhost/Connect4_allan");
+        
             //Obtém o nome do jogador e envia este nome para o servidor (isto corresponde ao registro do jogador);
             System.out.print("Digite seu nome: ");
             nomeJogador = entrada.next();
@@ -37,56 +41,71 @@ public class Connect4Client {
                 jogador = connect4.registraJogador(nomeJogador);
             }
             //Fim
+            
+            while (novaPartida.equalsIgnoreCase("S")) {
+                //A seguir, o cliente entra em um ciclo de teste em que ele espera que outro jogador se registre;
+                ordemJogada = connect4.temPartida(jogador);
+                switch(ordemJogada) {
+                    case -1:
+                        throw new Exception("Ocorreu um erro na requisição por partida.");
 
-            //A seguir, o cliente entra em um ciclo de teste em que ele espera que outro jogador se registre;
-            ordemJogada = connect4.temPartida(jogador);
-            switch(ordemJogada) {
-                case -1:
-                    throw new Exception("Ocorreu um erro na requisição por partida.");
-                    
-                case 0:                
-                    System.out.print("Quantas colunas terá o tabuleiro (mínimo 7 colunas)? ");
-                    String tt = entrada.next();
-                    tamanhoTabuleiro = -1;
-                    
-                    while(tamanhoTabuleiro < 7) {
-                        try {
-                            tamanhoTabuleiro = Integer.valueOf(tt);
-                            
-                            if (tamanhoTabuleiro < 7) {
-                                System.out.print("Número de coluna é inválido, digite outro valor (mínimo 7 colunas): ");
-                                tt = entrada.next();
+                    case 0:                
+                        System.out.print("Quantas colunas terá o tabuleiro (mínimo 7 colunas)? ");
+                        String tt = entrada.next();
+                        tamanhoTabuleiro = -1;
+
+                        while(tamanhoTabuleiro < 7) {
+                            try {
+                                tamanhoTabuleiro = Integer.valueOf(tt);
+
+                                if (tamanhoTabuleiro < 7) {
+                                    System.out.print("Número de coluna é inválido, digite outro valor (mínimo 7 colunas): ");
+                                    tt = entrada.next();
+                                }
+
+                            } catch(Exception e) {
+                                tamanhoTabuleiro = -1;
                             }
-                            
-                        } catch(Exception e) {
-                            tamanhoTabuleiro = -1;
                         }
+
+                        if (connect4.criaPartida(jogador, tamanhoTabuleiro) < 0)
+                            throw new Exception("Ocorreu um erro na criação de uma partida.");
+
+                        ordemJogada++;
+                    break;
+                }
+
+                String continuar = "";
+
+                while(!continuar.equalsIgnoreCase("S") && !continuar.equalsIgnoreCase("N")) {
+                    System.out.print("Você será o " + ordemJogada + " a jogar, deseja continuar (S/N)? ");
+                    continuar = entrada.next();
+
+                    if (continuar.equalsIgnoreCase("N")) {
+                        connect4.encerraPartida(jogador);
+                        System.out.print("Partida Encerrada.");
                     }
-                    
-                    if (connect4.criaPartida(jogador, tamanhoTabuleiro) < 0)
-                        throw new Exception("Ocorreu um erro na criação de uma partida.");
+                }
+                //Fim
+
+                //Após o registro do segundo jogador, passa­se para um ciclo de jogadas até o fim da partida.
+                if (!continuar.equalsIgnoreCase("N"))
+                    jogadas(connect4, jogador);
+                //Fim
                 
-                    ordemJogada++;
-                break;
-            }
-            
-            System.out.print("Você será o " + ordemJogada + " a jogar, deseja continuar (S/N)? ");
-            String continuar = entrada.next();
-            
-            while(!continuar.equalsIgnoreCase("S") && !continuar.equalsIgnoreCase("N")) {
-                System.out.print("Você será o " + ordemJogada + " a jogar, deseja continuar (S/N)? ");
-                continuar = entrada.next();
+                System.out.print("Deseja iniciar uma nova partida? (S/N)? ");
+                novaPartida = entrada.next();
                 
-                if (continuar.equalsIgnoreCase("N")) {
-                    connect4.encerraPartida(jogador);
-                    System.out.print("Partida Encerrada.");
+                while(!novaPartida.equalsIgnoreCase("S") && !novaPartida.equalsIgnoreCase("N")) {
+                    System.out.print("Deseja iniciar uma nova partida? (S/N)? ");
+                    novaPartida = entrada.next();
+
+                    if (novaPartida.equalsIgnoreCase("N")) {
+                        connect4.encerraJogador(jogador);
+                        System.out.print("Jogo Encerrado.");
+                    }
                 }
             }
-            //Fim
-            
-            //Após o registro do segundo jogador, passa­se para um ciclo de jogadas até o fim da partida.
-            jogadas(connect4, jogador);
-            //Fim
 
         } catch (NotBoundException | MalformedURLException | RemoteException | HeadlessException e) {
             JOptionPane.showMessageDialog(null, e.getMessage(), "ERRO",JOptionPane.ERROR);

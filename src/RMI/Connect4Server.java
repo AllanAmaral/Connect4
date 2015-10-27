@@ -1,5 +1,6 @@
 package RMI;
 
+import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 
@@ -20,12 +21,11 @@ public class Connect4Server {
         }
 
         try {
-                Naming.rebind ("Connect4", new Connect4Impl ());
+                Naming.rebind ("Connect4_allan", new Connect4Impl ());
                 System.out.println ("Connect4Server is ready.");
 
-        } catch (Exception e) {
-                System.out.println ("Connect4Server failed:");
-                e.printStackTrace();
+        } catch (RemoteException | MalformedURLException e) {
+                System.out.println ("Connect4Server failed:" + e.getMessage());
         }
         
         //inicializa a configuração necessária para executar até 50 partidas simultâneas;

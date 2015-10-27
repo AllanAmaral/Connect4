@@ -51,6 +51,8 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
     @Override
     public synchronized int temPartida(Integer idJogador) throws RemoteException {
         if (partidas.isEmpty()) return 0;
+        if (partidas.size() > 49) 
+            throw new RemoteException("O jogo atingiu seu limite de 50 partidas simultâneas, por favor tente mais tarde.");
   
        List<Partida> partidasAux = partidas.stream().filter(p -> 
                 (p.getJogadores() != null && p.getJogadores().size() < 2))
@@ -97,7 +99,9 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
         Jogador jogador = jogadores.get(idJogador);
         Integer vencedor = 0;
         
-        if (partida == null || jogador == null) return -1;
+        if (partida == null && jogador == null) return -1;
+        
+        if (partida == null) return 5;
         
         if (partida.getJogadores().size() > 1)
             vencedor = verificarVencedor(partida, jogador);
@@ -110,7 +114,7 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
     }
 
     @Override
-    public String obtemGrade(Integer idJogador) throws RemoteException {
+    public synchronized String obtemGrade(Integer idJogador) throws RemoteException {
         Partida partida = getMinhaPartida(idJogador);
         String grade = " ";
         
@@ -146,7 +150,7 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
         Partida partida = getMinhaPartida(idJogador);
         Jogador jogador = jogadores.get(idJogador);
         
-        if (partida == null) return -1;
+        if (partida == null) return ehMinhaVez(idJogador);
         
         Tabuleiro tabuleiro = partida.getTabuleiro();
         Integer[][] grade = tabuleiro.getGrade();
@@ -172,12 +176,21 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
         
         if (partida == null) return -1;
         
-        Jogador jogador = jogadores.get(idJogador);
+        Jogador jogador = this.jogadores.get(idJogador);
         Jogador oponente = this.jogadores.get(partida.getJogadores().stream().filter(j -> !j.equals(idJogador))
                 .collect(Collectors.toList()).get(0));
 
         jogador.setStatus(6);   // 6 -> perdedor por WO
         oponente.setStatus(5);  // 5 -> vencedor por WO
+        
+        this.partidas.remove(partida);
+        
+        return 0;
+    }
+    
+    @Override
+    public int encerraJogador(Integer idJogador) throws RemoteException {
+        this.jogadores.remove(idJogador);
         
         return 0;
     }
