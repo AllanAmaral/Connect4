@@ -83,7 +83,7 @@ public class Connect4Client {
 
                     if (continuar.equalsIgnoreCase("N")) {
                         connect4.encerraPartida(jogador);
-                        System.out.print("Partida Encerrada.");
+                        System.out.println("Partida Encerrada.");
                     }
                 }
                 //Fim

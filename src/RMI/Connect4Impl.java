@@ -68,6 +68,7 @@ public class Connect4Impl extends UnicastRemoteObject implements Connect4Interfa
         partida.setJogadorDaVez(1);
         
         Jogador jogador = jogadores.get(idJogador);
+        jogador.setStatus(0);
         jogador.setOrdemJogada(partida.getJogadores().size());
         
         return partida.getJogadores().size();
