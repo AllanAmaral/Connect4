@@ -58,7 +58,15 @@ public interface Connect4Interface extends Remote {
     
     //-1 -> erro
     // 0 -> sucesso
+    public int encerraPartidaComResultado(Integer idJogador) throws RemoteException;
+    
+    //-1 -> erro
+    // 0 -> sucesso
     public int encerraJogador(Integer idJogador) throws RemoteException;
+    
+    //-1 -> erro
+    // 0 -> sucesso
+    public int zeraJogador(Integer idJogador) throws RemoteException;
     
     //String vazia -> erro
     //String com o nome do jogador

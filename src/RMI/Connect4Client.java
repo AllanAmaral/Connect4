@@ -44,22 +44,23 @@ public class Connect4Client {
             
             while (novaPartida.equalsIgnoreCase("S")) {
                 //A seguir, o cliente entra em um ciclo de teste em que ele espera que outro jogador se registre;
+                connect4.zeraJogador(jogador);
                 ordemJogada = connect4.temPartida(jogador);
                 switch(ordemJogada) {
                     case -1:
                         throw new Exception("Ocorreu um erro na requisição por partida.");
 
                     case 0:                
-                        System.out.print("Quantas colunas terá o tabuleiro (mínimo 7 colunas)? ");
+                        System.out.print("Quantas colunas terá o tabuleiro (mínimo 4 colunas)? ");
                         String tt = entrada.next();
                         tamanhoTabuleiro = -1;
 
-                        while(tamanhoTabuleiro < 7) {
+                        while(tamanhoTabuleiro < 4) {
                             try {
                                 tamanhoTabuleiro = Integer.valueOf(tt);
 
-                                if (tamanhoTabuleiro < 7) {
-                                    System.out.print("Número de coluna é inválido, digite outro valor (mínimo 7 colunas): ");
+                                if (tamanhoTabuleiro < 4) {
+                                    System.out.print("Número de coluna é inválido, digite outro valor (mínimo 4 colunas): ");
                                     tt = entrada.next();
                                 }
 
@@ -153,29 +154,37 @@ public class Connect4Client {
                             coluna = -1;
                         }
                     }
+                    Integer jogada = connect4.enviaJogada(jogador, coluna);
                     
-                    connect4.enviaJogada(jogador, coluna);
                     System.out.println(connect4.obtemGrade(jogador));
+                    
+                    if (jogada == 0)
+                        System.out.println("A coluna " + coluna + " está cheia.");
                 break;
 
                 case 2:
                     System.out.println("Parabéns " + nomeJogador + ", você é o vencedor!!!");
+                    connect4.encerraPartidaComResultado(jogador);
                     return;
 
                 case 3:
                     System.out.println("Que pena " + nomeJogador + ", você perdeu.");
+                    connect4.encerraPartidaComResultado(jogador);
                     return; 
 
                 case 4:
                     System.out.println("Bom jogo " + nomeJogador + ", acabou empatado.");
+                    connect4.encerraPartidaComResultado(jogador);
                     return;
 
                 case 5:
                     System.out.println("Parabéns " + nomeJogador + ", você venceu por WO!!!");
+                    connect4.encerraPartidaComResultado(jogador);
                     return;
 
                 case 6:
                     System.out.println("Que pena " + nomeJogador + ", você perdeu por WO.");
+                    connect4.encerraPartidaComResultado(jogador);
                     return;
             }
             Thread.sleep(5000);
